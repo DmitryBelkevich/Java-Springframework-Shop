@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-4.2.xsd
+	"
+>
+	
+	<http pattern="/resources/css/**" security="none" />
+	<http pattern="/resources/js/**" security="none" />
+	<http pattern="/resources/images/**" security="none" />
+	
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/cabinet**" access="isAuthenticated()" />
+		<intercept-url pattern="/admin**" access="hasRole('ADMIN')" />
+		
+		<form-login
+			login-page="/user/login"
+			login-processing-url="/auth"
+			username-parameter="username"
+			password-parameter="password"
+			default-target-url="/"
+			always-use-default-target="true"
+			authentication-failure-url="/user/login?error=incorrectLoginPassword"
+		/>
+		
+		<access-denied-handler error-page="/user/access_denied" />
+		
+		<logout logout-url="/logout**" />
+		
+		<remember-me user-service-ref="userService" key="shop_key" />
+		<csrf disabled="true" />
+	</http>
+	
+	<authentication-manager>
+		<authentication-provider user-service-ref="userService">
+			<password-encoder ref="passwordHelper" />
+		</authentication-provider>
+	</authentication-manager>
+	
+</beans:beans>
